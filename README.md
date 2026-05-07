@@ -1,5 +1,11 @@
 # XrayR
 
+
+Updated at 2026-May05-07
+```
+docker pull ghcr.io/hello-world-1989/xrayr-docker:latest
+```
+
 [![](https://img.shields.io/badge/TgChat-@XrayR讨论-blue.svg)](https://t.me/XrayR_project)
 [![](https://img.shields.io/badge/Channel-@XrayR通知-blue.svg)](https://t.me/XrayR_channel)
 ![](https://img.shields.io/github/stars/XrayR-project/XrayR)

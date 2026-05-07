@@ -17,7 +17,9 @@ import (
 
 	"github.com/XrayR-project/XrayR/api"
 	"github.com/XrayR-project/XrayR/app/mydispatcher"
+	"github.com/XrayR-project/XrayR/common/limiter"
 	"github.com/XrayR-project/XrayR/common/mylego"
+	"github.com/XrayR-project/XrayR/common/rule"
 	"github.com/XrayR-project/XrayR/common/serverstatus"
 )
 
@@ -60,16 +62,29 @@ func New(server *core.Instance, api api.API, config *Config, panelType string) *
 		"Type": api.Describe().NodeType,
 		"ID":   api.Describe().NodeID,
 	})
+	ibm := server.GetFeature(inbound.ManagerType()).(inbound.Manager)
+	obm := server.GetFeature(outbound.ManagerType()).(outbound.Manager)
+	stm := server.GetFeature(stats.ManagerType()).(stats.Manager)
+	pm := server.GetFeature(policy.ManagerType()).(policy.Manager)
+
+	customDispatcher, _ := server.GetFeature(mydispatcher.Type()).(*mydispatcher.DefaultDispatcher)
+	if customDispatcher == nil {
+		customDispatcher = &mydispatcher.DefaultDispatcher{
+			Limiter:     limiter.New(),
+			RuleManager: rule.New(),
+		}
+	}
+
 	controller := &Controller{
 		server:     server,
 		config:     config,
 		apiClient:  api,
 		panelType:  panelType,
-		ibm:        server.GetFeature(inbound.ManagerType()).(inbound.Manager),
-		obm:        server.GetFeature(outbound.ManagerType()).(outbound.Manager),
-		stm:        server.GetFeature(stats.ManagerType()).(stats.Manager),
-		pm:         server.GetFeature(policy.ManagerType()).(policy.Manager),
-		dispatcher: server.GetFeature(mydispatcher.Type()).(*mydispatcher.DefaultDispatcher),
+		ibm:        ibm,
+		obm:        obm,
+		stm:        stm,
+		pm:         pm,
+		dispatcher: customDispatcher,
 		startAt:    time.Now(),
 		logger:     logger,
 	}

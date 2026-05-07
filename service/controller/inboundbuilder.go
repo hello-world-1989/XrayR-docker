@@ -98,6 +98,9 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 	case "Shadowsocks", "Shadowsocks-Plugin":
 		protocol = "shadowsocks"
 		cipher := strings.ToLower(nodeInfo.CypherMethod)
+		if cipher == "" {
+			cipher = "aes-128-gcm"
+		}
 
 		proxySetting = &conf.ShadowsocksServerConfig{
 			Cipher:   cipher,
@@ -119,10 +122,6 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 		}
 
 		proxySetting.NetworkList = &conf.NetworkList{"tcp", "udp"}
-		proxySetting.IVCheck = true
-		if config.DisableIVCheck {
-			proxySetting.IVCheck = false
-		}
 
 	case "dokodemo-door":
 		protocol = "dokodemo-door"
